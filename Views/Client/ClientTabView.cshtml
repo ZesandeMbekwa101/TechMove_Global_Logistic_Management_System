@@ -1,0 +1,304 @@
+﻿@model IEnumerable<TechMove_Global_Logistic_Management_System.Models.ClientModel>
+
+@{
+    ViewData["Title"] = "Clients";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+
+<style>
+    .page-card {
+        background: #fff;
+        border-radius: 14px;
+        padding: 20px;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.06);
+    }
+
+    .page-title h4 {
+        font-size: 20px;
+        font-weight: 700;
+        margin: 0;
+        color: #0f172a;
+    }
+
+    .page-title p {
+        font-size: 13px;
+        color: #64748b;
+        margin: 3px 0 0;
+    }
+
+    .filter-bar {
+        background: #fff;
+        border-radius: 12px;
+        padding: 15px;
+        border: 1px solid #e5e7eb;
+    }
+
+    .table th {
+        font-size: 12px;
+        color: #475569;
+        background: #f8fafc;
+    }
+
+    .table td {
+        font-size: 13px;
+        vertical-align: middle;
+    }
+
+    .status-badge {
+        padding: 5px 10px;
+        border-radius: 8px;
+        font-size: 12px;
+        font-weight: 600;
+    }
+
+    .status-active {
+        background: #dcfce7;
+        color: #15803d;
+    }
+
+    .action-btn {
+        border: 1px solid #e5e7eb;
+        background: #fff;
+        border-radius: 8px;
+        padding: 5px 10px;
+    }
+
+    .dropdown-menu {
+        border: none;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+        border-radius: 10px;
+    }
+
+    .dropdown-item {
+        font-size: 13px;
+        padding: 10px 14px;
+    }
+</style>
+
+<div class="page-card">
+
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div class="page-title">
+            <h4>Clients</h4>
+            <p>Manage and view all logistics clients</p>
+        </div>
+
+        <button class="btn btn-primary btn-sm"
+                data-bs-toggle="modal"
+                data-bs-target="#addClientModal">
+            <i class="fa fa-plus me-1"></i> Add Client
+        </button>
+    </div>
+
+    <form method="get" asp-action="ClientTabView">
+        <div class="filter-bar mb-3">
+            <div class="row g-2 align-items-end">
+
+                <div class="col-md-5">
+                    <label class="small text-muted mb-1">Search</label>
+
+                    <div class="input-group">
+                        <span class="input-group-text bg-white">
+                            <i class="fa fa-search"></i>
+                        </span>
+
+                        <input type="text"
+                               name="search"
+                               value="@Context.Request.Query["search"]"
+                               class="form-control"
+                               placeholder="Search clients by name, email, region..." />
+                    </div>
+                </div>
+
+                <div class="col-md-2">
+                    <label class="small text-muted mb-1">Region</label>
+
+                    <select name="region" class="form-select">
+                        <option value="">All Regions</option>
+
+                        @if (Context.Request.Query["region"] == "Europe")
+                        {
+                            <option value="Europe" selected>Europe</option>
+                        }
+                        else
+                        {
+                            <option value="Europe">Europe</option>
+                        }
+
+                        @if (Context.Request.Query["region"] == "Africa")
+                        {
+                            <option value="Africa" selected>Africa</option>
+                        }
+                        else
+                        {
+                            <option value="Africa">Africa</option>
+                        }
+
+                        @if (Context.Request.Query["region"] == "North America")
+                        {
+                            <option value="North America" selected>North America</option>
+                        }
+                        else
+                        {
+                            <option value="North America">North America</option>
+                        }
+
+                        @if (Context.Request.Query["region"] == "Asia Pacific")
+                        {
+                            <option value="Asia Pacific" selected>Asia Pacific</option>
+                        }
+                        else
+                        {
+                            <option value="Asia Pacific">Asia Pacific</option>
+                        }
+                    </select>
+                </div>
+
+                <div class="col-md-2">
+                    <label class="small text-muted mb-1">Status</label>
+
+                    <select name="status" class="form-select">
+                        <option value="">Status: All</option>
+
+                        @if (Context.Request.Query["status"] == "Active")
+                        {
+                            <option value="Active" selected>Active</option>
+                        }
+                        else
+                        {
+                            <option value="Active">Active</option>
+                        }
+
+                        @if (Context.Request.Query["status"] == "Inactive")
+                        {
+                            <option value="Inactive" selected>Inactive</option>
+                        }
+                        else
+                        {
+                            <option value="Inactive">Inactive</option>
+                        }
+                    </select>
+                </div>
+
+                <div class="col-md-3">
+                    <label class="small text-muted mb-1">&nbsp;</label>
+
+                    <div class="d-flex gap-2">
+                        <button type="submit" class="btn btn-primary w-100">
+                            <i class="fa fa-filter me-1"></i> Filter
+                        </button>
+
+                        <a asp-action="ClientTabView" class="btn btn-light border w-100">
+                            Reset
+                        </a>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </form>
+
+    <div class="table-responsive">
+        <table class="table table-hover align-middle">
+            <thead>
+                <tr>
+                    <th>Client Name</th>
+                    <th>Contact Person</th>
+                    <th>Email</th>
+                    <th>Region</th>
+                    <th>Phone</th>
+                    <th>Contracts</th>
+                    <th>Status</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+
+            <tbody>
+                @if (Model != null && Model.Any())
+                {
+                    foreach (var client in Model)
+                    {
+                        <tr>
+                            <td><strong>@client.Client_Name</strong></td>
+                            <td>@client.Contact_Person</td>
+                            <td>@client.Email_Address</td>
+                            <td>@client.Region</td>
+                            <td>@client.Phone_Number</td>
+                            <td>@(client.Contracts != null ? client.Contracts.Count : 0)</td>
+
+                            <td>
+                                <span class="status-badge status-active">Active</span>
+                            </td>
+
+                            <td>
+                                <div class="dropdown">
+                                    <button class="action-btn dropdown-toggle"
+                                            type="button"
+                                            data-bs-toggle="dropdown">
+                                        <i class="fa fa-ellipsis-v"></i>
+                                    </button>
+
+                                    <ul class="dropdown-menu dropdown-menu-end">
+                                        <li>
+                                            <button class="dropdown-item"
+                                                    type="button"
+                                                    data-bs-toggle="modal"
+                                                    data-bs-target="#updateClientModal"
+                                                    onclick="setUpdateClientModal('@client.Client_Id', '@client.Client_Name', '@client.Contact_Person', '@client.Phone_Number', '@client.Email_Address', '@client.Region', '@client.Country')">
+                                                <i class="fa fa-edit me-2 text-primary"></i>
+                                                Update
+                                            </button>
+                                        </li>
+
+                                        <li>
+                                            <button class="dropdown-item text-danger"
+                                                    type="button"
+                                                    data-bs-toggle="modal"
+                                                    data-bs-target="#deleteClientModal"
+                                                    onclick="setDeleteClientModal('@client.Client_Id', '@client.Client_Name')">
+                                                <i class="fa fa-trash me-2"></i>
+                                                Delete
+                                            </button>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                }
+                else
+                {
+                    <tr>
+                        <td colspan="8" class="text-center text-muted py-4">
+                            No clients found.
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+
+</div>
+
+<partial name="_AddClientModalPartial" model="new TechMove_Global_Logistic_Management_System.Models.ClientModel()" />
+<partial name="_UpdateClientModalPartial" model="new TechMove_Global_Logistic_Management_System.Models.ClientModel()" />
+<partial name="_DeleteClientModalPartial" model="new TechMove_Global_Logistic_Management_System.Models.ClientModel()" />
+
+@section Scripts {
+    <script>
+        function setUpdateClientModal(id, clientName, contactPerson, phoneNumber, emailAddress, region, country) {
+            document.getElementById("editClientId").value = id;
+            document.getElementById("editClientName").value = clientName;
+            document.getElementById("editContactPerson").value = contactPerson;
+            document.getElementById("editPhoneNumber").value = phoneNumber;
+            document.getElementById("editEmailAddress").value = emailAddress;
+            document.getElementById("editRegion").value = region;
+            document.getElementById("editCountry").value = country;
+        }
+
+        function setDeleteClientModal(id, clientName) {
+            document.getElementById("deleteClientId").value = id;
+            document.getElementById("deleteClientName").innerText = clientName;
+        }
+    </script>
+}

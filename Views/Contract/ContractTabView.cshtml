@@ -1,0 +1,307 @@
+﻿@model IEnumerable<TechMove_Global_Logistic_Management_System.Models.ContractModel>
+
+@{
+    ViewData["Title"] = "Contracts";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+
+<style>
+    .page-card {
+        background: #fff;
+        border-radius: 14px;
+        padding: 20px;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.06);
+    }
+
+    .page-title h4 {
+        font-size: 20px;
+        font-weight: 700;
+        margin: 0;
+        color: #0f172a;
+    }
+
+    .page-title p {
+        font-size: 13px;
+        color: #64748b;
+        margin: 3px 0 0;
+    }
+
+    .filter-bar {
+        background: #fff;
+        border-radius: 12px;
+        padding: 15px;
+        border: 1px solid #e5e7eb;
+    }
+
+    .table th {
+        font-size: 12px;
+        color: #475569;
+        background: #f8fafc;
+    }
+
+    .table td {
+        font-size: 13px;
+        vertical-align: middle;
+    }
+
+    .status-badge {
+        padding: 5px 10px;
+        border-radius: 8px;
+        font-size: 12px;
+        font-weight: 600;
+    }
+
+    .status-active {
+        background: #dcfce7;
+        color: #15803d;
+    }
+
+    .status-expired {
+        background: #fee2e2;
+        color: #b91c1c;
+    }
+
+    .status-hold {
+        background: #fef3c7;
+        color: #b45309;
+    }
+
+    .status-draft {
+        background: #e2e8f0;
+        color: #334155;
+    }
+
+    .action-btn {
+        border: 1px solid #e5e7eb;
+        background: #fff;
+        border-radius: 8px;
+        padding: 5px 10px;
+    }
+
+    .filter-label {
+        font-size: 12px;
+        color: #64748b;
+        margin-bottom: 4px;
+    }
+</style>
+
+<div class="page-card">
+
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div class="page-title">
+            <h4>Contracts</h4>
+            <p>Manage all contracts and signed agreements</p>
+        </div>
+
+        <button class="btn btn-primary btn-sm"
+                data-bs-toggle="modal"
+                data-bs-target="#addContractModal">
+            <i class="fa fa-plus me-1"></i> New Contract
+        </button>
+    </div>
+
+    <form method="get" asp-action="ContractTabView">
+        <div class="filter-bar mb-3">
+            <div class="row g-2 align-items-end">
+
+                <div class="col-md-3">
+                    <label class="filter-label">Search</label>
+                    <input type="text"
+                           name="search"
+                           value="@Context.Request.Query["search"]"
+                           class="form-control"
+                           placeholder="Contract ID or client..." />
+                </div>
+
+                <div class="col-md-2">
+                    <label class="filter-label">Status</label>
+                    <select name="status" class="form-select">
+                        <option value="">All Statuses</option>
+
+                        @if (Context.Request.Query["status"] == "Draft")
+                        {
+                            <option value="Draft" selected>Draft</option>
+                        }
+                        else
+                        {
+                            <option value="Draft">Draft</option>
+                        }
+
+                        @if (Context.Request.Query["status"] == "Active")
+                        {
+                            <option value="Active" selected>Active</option>
+                        }
+                        else
+                        {
+                            <option value="Active">Active</option>
+                        }
+
+                        @if (Context.Request.Query["status"] == "Expired")
+                        {
+                            <option value="Expired" selected>Expired</option>
+                        }
+                        else
+                        {
+                            <option value="Expired">Expired</option>
+                        }
+
+                        @if (Context.Request.Query["status"] == "On Hold")
+                        {
+                            <option value="On Hold" selected>On Hold</option>
+                        }
+                        else
+                        {
+                            <option value="On Hold">On Hold</option>
+                        }
+                    </select>
+                </div>
+
+                <div class="col-md-2">
+                    <label class="filter-label">From Date</label>
+                    <input type="date"
+                           name="fromDate"
+                           value="@Context.Request.Query["fromDate"]"
+                           class="form-control" />
+                </div>
+
+                <div class="col-md-2">
+                    <label class="filter-label">To Date</label>
+                    <input type="date"
+                           name="toDate"
+                           value="@Context.Request.Query["toDate"]"
+                           class="form-control" />
+                </div>
+
+                <div class="col-md-3">
+                    <div class="d-flex gap-2">
+                        <button type="submit" class="btn btn-primary w-100">
+                            <i class="fa fa-filter me-1"></i> Filter
+                        </button>
+
+                        <a asp-action="ContractTabView"
+                           class="btn btn-light border w-100">
+                            Reset
+                        </a>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </form>
+
+    <div class="table-responsive">
+        <table class="table table-hover align-middle">
+            <thead>
+                <tr>
+                    <th>Contract No.</th>
+                    <th>Client</th>
+                    <th>Service Level</th>
+                    <th>Start Date</th>
+                    <th>End Date</th>
+                    <th>Status</th>
+                    <th>Signed Agreement</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+
+            <tbody>
+                @if (Model != null && Model.Any())
+                {
+                    foreach (var contract in Model)
+                    {
+                        var statusClass = contract.Status == "Active" ? "status-active"
+                        : contract.Status == "Expired" ? "status-expired"
+                        : contract.Status == "On Hold" ? "status-hold"
+                        : "status-draft";
+
+                        <tr>
+                            <td>CT-@contract.Contract_Id</td>
+                            <td>@contract.Client?.Client_Name</td>
+                            <td>@contract.Service_Level</td>
+                            <td>@contract.Start_Date.ToString("yyyy-MM-dd")</td>
+                            <td>@contract.End_Date.ToString("yyyy-MM-dd")</td>
+                            <td>
+                                <span class="status-badge @statusClass">@contract.Status</span>
+                            </td>
+                            <td>
+                                @if (contract.SupportDocument != null)
+                                {
+                                    <a href="@contract.SupportDocument.File_Path" target="_blank">
+                                        <i class="fa fa-file-pdf text-danger me-1"></i>
+                                        @contract.SupportDocument.File_Name
+                                    </a>
+                                }
+                                else
+                                {
+                                    <span class="text-muted">No PDF uploaded</span>
+                                }
+                            </td>
+                            <td>
+                                <div class="dropdown">
+                                    <button class="action-btn dropdown-toggle"
+                                            type="button"
+                                            data-bs-toggle="dropdown">
+                                        <i class="fa fa-ellipsis-v"></i>
+                                    </button>
+
+                                    <ul class="dropdown-menu dropdown-menu-end">
+                                        <li>
+                                            <button class="dropdown-item"
+                                                    type="button"
+                                                    data-bs-toggle="modal"
+                                                    data-bs-target="#updateContractModal"
+                                                    onclick="setUpdateContractModal('@contract.Contract_Id', '@contract.Client_Id', '@contract.Start_Date.ToString("yyyy-MM-dd")', '@contract.End_Date.ToString("yyyy-MM-dd")', '@contract.Status', '@contract.Service_Level')">
+                                                <i class="fa fa-edit me-2 text-primary"></i> Update
+                                            </button>
+                                        </li>
+
+                                        <li>
+                                            <button class="dropdown-item text-danger"
+                                                    type="button"
+                                                    data-bs-toggle="modal"
+                                                    data-bs-target="#deleteContractModal"
+                                                    onclick="setDeleteContractModal('@contract.Contract_Id')">
+                                                <i class="fa fa-trash me-2"></i> Delete
+                                            </button>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                }
+                else
+                {
+                    <tr>
+                        <td colspan="8" class="text-center text-muted py-4">
+                            No contracts found.
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+
+</div>
+
+<partial name="_AddContractModalPartial" />
+<partial name="_UpdateContractModalPartial" />
+<partial name="_DeleteContractModalPartial" />
+
+@section Scripts {
+    <script>
+        function setUpdateContractModal(id, clientId, startDate, endDate, status, serviceLevel) {
+            document.getElementById("editContractId").value = id;
+            document.getElementById("editContractClientId").value = clientId;
+            document.getElementById("editStartDate").value = startDate;
+            document.getElementById("editEndDate").value = endDate;
+            document.getElementById("editStatus").value = status;
+            document.getElementById("editServiceLevel").value = serviceLevel;
+        }
+
+        function setDeleteContractModal(id) {
+            document.getElementById("deleteContractId").value = id;
+            document.getElementById("deleteContractName").innerText = "CT-" + id;
+        }
+    </script>
+}
