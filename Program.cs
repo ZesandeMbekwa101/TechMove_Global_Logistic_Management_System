@@ -1,6 +1,4 @@
 using Microsoft.EntityFrameworkCore;
-using TechMove_Global_Logistic_Management_System.Data;
-using TechMove_Global_Logistic_Management_System.Helpers;
 using TechMove_Global_Logistic_Management_System.Services;
 
 namespace TechMove_Global_Logistic_Management_System
@@ -12,18 +10,22 @@ namespace TechMove_Global_Logistic_Management_System
             var builder = WebApplication.CreateBuilder(args);
 
             // Add services to the container.
-            builder.Services.AddControllersWithViews();
-            builder.Services.AddHttpContextAccessor();
-            builder.Services.AddSession();
-            builder.Services.AddScoped<CurrencyService>();
-            builder.Services.AddScoped<FileValidationService>();
-            builder.Services.AddScoped<ContractBusinessService>();
+            builder.Services.AddScoped<ApiService>();
+            builder.Services.AddScoped<ClientService>();
+            builder.Services.AddScoped<AuditLogService>();
+            builder.Services.AddScoped<ContractService>();
+            builder.Services.AddHttpClient<ServiceRequestService>();
+            builder.Services.AddScoped<ServiceRequestService>();
+            builder.Services.AddAuthorization();
             builder.Services.AddScoped<AuthService>();
-            builder.Services.AddScoped<SearchFilterHelper>();
-            builder.Services.AddScoped<AuditLogHelper>();
-            builder.Services.AddDbContext<ApplicationDbContext>(options =>
-                options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));  
+            builder.Services.AddControllersWithViews();
+            builder.Services.AddSession();
 
+            builder.Services.AddHttpClient("TechMoveAPI", client =>
+            {
+                client.BaseAddress = new Uri(
+                    builder.Configuration["ApiSettings:BaseUrl"]);
+            });
             var app = builder.Build();
 
             // Configure the HTTP request pipeline.

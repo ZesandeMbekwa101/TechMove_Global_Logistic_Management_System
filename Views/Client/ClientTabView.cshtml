@@ -1,5 +1,4 @@
-﻿@model IEnumerable<TechMove_Global_Logistic_Management_System.Models.ClientModel>
-
+﻿@model List<TechMove_Global_Logistic_Management_System.Models.DTOs.ClientResponseDto>
 @{
     ViewData["Title"] = "Clients";
     Layout = "~/Views/Shared/_AdminLayout.cshtml";
@@ -224,7 +223,7 @@
                             <td>@client.Email_Address</td>
                             <td>@client.Region</td>
                             <td>@client.Phone_Number</td>
-                            <td>@(client.Contracts != null ? client.Contracts.Count : 0)</td>
+                            <td>0</td>
 
                             <td>
                                 <span class="status-badge status-active">Active</span>
@@ -279,11 +278,9 @@
     </div>
 
 </div>
-
-<partial name="_AddClientModalPartial" model="new TechMove_Global_Logistic_Management_System.Models.ClientModel()" />
-<partial name="_UpdateClientModalPartial" model="new TechMove_Global_Logistic_Management_System.Models.ClientModel()" />
-<partial name="_DeleteClientModalPartial" model="new TechMove_Global_Logistic_Management_System.Models.ClientModel()" />
-
+@await Html.PartialAsync("_AddClientModalPartial")
+@await Html.PartialAsync("_UpdateClientModalPartial")
+@await Html.PartialAsync("_DeleteClientModalPartial")
 @section Scripts {
     <script>
         function setUpdateClientModal(id, clientName, contactPerson, phoneNumber, emailAddress, region, country) {

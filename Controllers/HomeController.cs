@@ -1,6 +1,6 @@
 using System.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
-using TechMove_Global_Logistic_Management_System.Models;
+using TechMove_Global_Logistic_Management_System.Model;
 
 namespace TechMove_Global_Logistic_Management_System.Controllers
 {

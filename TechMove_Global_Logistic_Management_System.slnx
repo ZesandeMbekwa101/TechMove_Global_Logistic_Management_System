@@ -1,4 +1,5 @@
 <Solution>
-  <Project Path="../TechMove_Global_Logistic_Management_System.Tests/TechMove_Global_Logistic_Management_System.Tests.csproj" Id="c07b0033-c39b-48de-a341-2938b00e3fa2" />
+  <Project Path="../TechMove_Global_Logistic_Management_System_ServiceLayer_API/TechMove_Global_Logistic_Management_System_ServiceLayer_API.csproj" Id="11f9fe97-c208-4b52-900a-772ef8c8aae9" />
+  <Project Path="../TechMove_Global_Logistic_Management_System_Tests/TechMove_Global_Logistic_Management_System_Tests.csproj" Id="eb8aafac-c7d9-48d2-a6ea-cd8545fc14de" />
   <Project Path="TechMove_Global_Logistic_Management_System.csproj" />
 </Solution>

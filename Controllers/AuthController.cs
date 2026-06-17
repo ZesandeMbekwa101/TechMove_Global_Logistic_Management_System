@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using TechMove_Global_Logistic_Management_System.Services;
+using TechMove_Global_Logistic_Management_System.ViewModels;
 
 namespace TechMove_Global_Logistic_Management_System.Controllers
 {
@@ -19,14 +20,14 @@ namespace TechMove_Global_Logistic_Management_System.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> Login(string username, string password)
+        public async Task<IActionResult> Login(LoginRequestDto dto)
         {
-            var loginSuccess = await _authService.LoginAsync(username, password, HttpContext);
+            var success = await _authService.LoginAsync(dto, HttpContext);
 
-            if (!loginSuccess)
+            if (!success)
             {
                 TempData["Error"] = "Invalid username or password";
-                return RedirectToAction("DashboardView", "Admin");
+                return RedirectToAction("LoginView");
             }
 
             TempData["Success"] = "Login successful";
@@ -38,8 +39,8 @@ namespace TechMove_Global_Logistic_Management_System.Controllers
         {
             await _authService.LogoutAsync(HttpContext);
 
-            TempData["Success"] = "Logged out successfully.";
-            return RedirectToAction("DashboardView", "Admin");
+            TempData["Success"] = "Logged out successfully";
+            return RedirectToAction("LoginView");
         }
     }
 }

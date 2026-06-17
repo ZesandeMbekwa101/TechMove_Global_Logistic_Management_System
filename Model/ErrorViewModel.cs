@@ -1,4 +1,4 @@
-namespace TechMove_Global_Logistic_Management_System.Models
+﻿namespace TechMove_Global_Logistic_Management_System.Model
 {
     public class ErrorViewModel
     {

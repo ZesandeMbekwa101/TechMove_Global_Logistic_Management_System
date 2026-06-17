@@ -1,5 +1,4 @@
-﻿@model IEnumerable<TechMove_Global_Logistic_Management_System.Models.ContractModel>
-
+﻿@model List<TechMove_Global_Logistic_Management_System.Models.DTOs.ContractResponseDto>
 @{
     ViewData["Title"] = "Contracts";
     Layout = "~/Views/Shared/_AdminLayout.cshtml";
@@ -216,7 +215,7 @@
 
                         <tr>
                             <td>CT-@contract.Contract_Id</td>
-                            <td>@contract.Client?.Client_Name</td>
+                            <td>@contract.Client_Name</td>
                             <td>@contract.Service_Level</td>
                             <td>@contract.Start_Date.ToString("yyyy-MM-dd")</td>
                             <td>@contract.End_Date.ToString("yyyy-MM-dd")</td>
@@ -224,11 +223,11 @@
                                 <span class="status-badge @statusClass">@contract.Status</span>
                             </td>
                             <td>
-                                @if (contract.SupportDocument != null)
+                                @if (!string.IsNullOrEmpty(contract.File_Path))
                                 {
-                                    <a href="@contract.SupportDocument.File_Path" target="_blank">
+                                    <a href="@contract.File_Path" target="_blank">
                                         <i class="fa fa-file-pdf text-danger me-1"></i>
-                                        @contract.SupportDocument.File_Name
+                                        @contract.File_Name
                                     </a>
                                 }
                                 else
@@ -284,9 +283,9 @@
 
 </div>
 
-<partial name="_AddContractModalPartial" />
-<partial name="_UpdateContractModalPartial" />
-<partial name="_DeleteContractModalPartial" />
+@await Html.PartialAsync("_AddContractModalPartial")
+@await Html.PartialAsync("_UpdateContractModalPartial")
+@await Html.PartialAsync("_DeleteContractModalPartial")
 
 @section Scripts {
     <script>

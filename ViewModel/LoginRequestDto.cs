@@ -2,13 +2,12 @@
 
 namespace TechMove_Global_Logistic_Management_System.ViewModels
 {
-    public class LoginViewModel
+    public class LoginRequestDto
     {
-        [Required(ErrorMessage = "Username required")]
+        [Required]
         public string Username { get; set; }
 
-        [Required(ErrorMessage = "Password required")]
-        [DataType(DataType.Password)]
+        [Required]
         public string Password { get; set; }
     }
 }

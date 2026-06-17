@@ -1,27 +1,27 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using TechMove_Global_Logistic_Management_System.Data;
+using TechMove_Global_Logistic_Management_System.Services;
 
 namespace TechMove_Global_Logistic_Management_System.Controllers
 {
     public class AuditLogController : Controller
     {
-        private readonly ApplicationDbContext _context;
+        private readonly AuditLogService _auditLogService;
 
-        public AuditLogController(ApplicationDbContext context)
+        public AuditLogController(
+            AuditLogService auditLogService)
         {
-            _context = context;
+            _auditLogService = auditLogService;
         }
 
         [HttpGet]
-        public async Task<IActionResult> AuditLogTabView()
+        public async Task<IActionResult>
+            AuditLogTabView()
         {
-            var logs = await _context.AuditLogs
-                .Include(a => a.Admin)
-                .OrderByDescending(a => a.Created_On)
-                .ToListAsync();
+            var auditLogs =
+                await _auditLogService
+                .GetAllAuditLogsAsync();
 
-            return View(logs);
+            return View(auditLogs);
         }
     }
 }

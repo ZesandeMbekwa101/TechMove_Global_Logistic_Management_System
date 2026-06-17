@@ -1,5 +1,4 @@
-﻿@model IEnumerable<TechMove_Global_Logistic_Management_System.Models.AuditLogModel>
-
+﻿@model List<TechMove_Global_Logistic_Management_System.Models.DTOs.AuditLogDto>
 @{
     ViewData["Title"] = "Audit Logs";
     Layout = "~/Views/Shared/_AdminLayout.cshtml";
@@ -173,7 +172,7 @@
 
                         <tr>
                             <td>LOG-@log.Audit_Log_Id.ToString("D4")</td>
-                            <td>@log.Admin?.Username</td>
+                            <td>@log.Admin_Name</td>
                             <td>
                                 <span class="status-badge @actionClass">@log.Action</span>
                             </td>

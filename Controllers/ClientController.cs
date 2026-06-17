@@ -1,162 +1,71 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using TechMove_Global_Logistic_Management_System.Data;
-using TechMove_Global_Logistic_Management_System.Helpers;
-using TechMove_Global_Logistic_Management_System.Models;
-using TechMove_Global_Logistic_Management_System.ViewModel;
+using TechMove_Global_Logistic_Management_System.Models.DTOs;
+using TechMove_Global_Logistic_Management_System.Services;
 
 namespace TechMove_Global_Logistic_Management_System.Controllers
 {
     public class ClientController : Controller
     {
-        private readonly AuditLogHelper _auditHelper;
-        private readonly ApplicationDbContext _context;
-        private readonly SearchFilterHelper _searchHelper;
+        private readonly ClientService _clientService;
 
-        public ClientController(ApplicationDbContext context, AuditLogHelper auditHelper, SearchFilterHelper searchHelper)
+        public ClientController(ClientService clientService)
         {
-            _context = context;
-            _auditHelper = auditHelper;
-            _searchHelper = searchHelper;
+            _clientService = clientService;
         }
+
         [HttpGet]
-        public async Task<IActionResult> ClientTabView(FilterViewModel filter, string? region)
+        public async Task<IActionResult> ClientTabView(
+            string? search,
+            string? region)
         {
-            var query = _context.Clients
-                .Include(c => c.Contracts)
-                .AsQueryable();
-
-            query = _searchHelper.FilterClients(query, filter, region);
-
-            var clients = await query
-                .OrderByDescending(c => c.Client_Id)
-                .ToListAsync();
+            var clients =
+                await _clientService.GetAllClientsAsync(
+                    search,
+                    region);
 
             return View(clients);
         }
 
         [HttpPost]
-        public async Task<IActionResult> AddClient(ClientModel model)
+        public async Task<IActionResult> AddClient(CreateClientDto dto)
         {
-            if (!ModelState.IsValid)
-            {
-                await _auditHelper.LogAsync(
-                    1,
-                    "Created",
-                    "Clients",
-                    "Failed attempt to add a new client because required fields were missing.",
-                    "Failed"
-                );
+            var success =
+                await _clientService.AddClientAsync(dto);
 
-                TempData["Error"] = "Please complete all required fields.";
-                return RedirectToAction("ClientTabView");
-            }
+            if (success)
+                TempData["Success"] = "Client added successfully";
+            else
+                TempData["Error"] = "Failed to add client";
 
-            _context.Clients.Add(model);
-            await _context.SaveChangesAsync();
-
-            await _auditHelper.LogAsync(
-                model.Admin_Id,
-                "Created",
-                "Clients",
-                $"Created new client: {model.Client_Name}"
-            );
-
-            TempData["Success"] = "Client added successfully.";
-            return RedirectToAction("ClientTabView");
+            return RedirectToAction(nameof(ClientTabView));
         }
 
         [HttpPost]
-        public async Task<IActionResult> UpdateClient(ClientModel model)
+        public async Task<IActionResult> UpdateClient(UpdateClientDto dto)
         {
-            var client = await _context.Clients.FindAsync(model.Client_Id);
+            var success =
+                await _clientService.UpdateClientAsync(dto);
 
-            if (client == null)
-            {
-                await _auditHelper.LogAsync(
-                    1,
-                    "Updated",
-                    "Clients",
-                    $"Failed attempt to update client with ID {model.Client_Id} because the client was not found.",
-                    "Failed"
-                );
+            if (success)
+                TempData["Success"] = "Client updated successfully";
+            else
+                TempData["Error"] = "Failed to update client";
 
-                TempData["Error"] = "Client not found.";
-                return RedirectToAction("ClientTabView");
-            }
-
-            var adminId = client.Admin_Id;
-
-            client.Client_Name = model.Client_Name;
-            client.Contact_Person = model.Contact_Person;
-            client.Phone_Number = model.Phone_Number;
-            client.Email_Address = model.Email_Address;
-            client.Region = model.Region;
-            client.Country = model.Country;
-
-            await _context.SaveChangesAsync();
-
-            await _auditHelper.LogAsync(
-                adminId,
-                "Updated",
-                "Clients",
-                $"Updated client '{client.Client_Name}'."
-            );
-
-            TempData["Success"] = "Client updated successfully.";
-            return RedirectToAction("ClientTabView");
+            return RedirectToAction(nameof(ClientTabView));
         }
 
         [HttpPost]
         public async Task<IActionResult> DeleteClient(int id)
         {
-            var client = await _context.Clients
-                .Include(c => c.Contracts)
-                .FirstOrDefaultAsync(c => c.Client_Id == id);
+            var success =
+                await _clientService.DeleteClientAsync(id);
 
-            if (client == null)
-            {
-                await _auditHelper.LogAsync(
-                    1,
-                    "Delete",
-                    "Clients",
-                    $"Failed attempt to delete client with ID {id} because the client was not found.",
-                    "Failed"
-                );
+            if (success)
+                TempData["Success"] = "Client deleted successfully";
+            else
+                TempData["Error"] = "Failed to delete client";
 
-                TempData["Error"] = "Client not found.";
-                return RedirectToAction("ClientTabView");
-            }
-
-            if (client.Contracts.Any())
-            {
-                await _auditHelper.LogAsync(
-                    client.Admin_Id,
-                    "Delete",
-                    "Clients",
-                    $"Failed attempt to delete client '{client.Client_Name}' because the client has active contracts.",
-                    "Failed"
-                );
-
-                TempData["Error"] = "Cannot delete this client because it has contracts.";
-                return RedirectToAction("ClientTabView");
-            }
-
-            var clientName = client.Client_Name;
-            var adminId = client.Admin_Id;
-
-            _context.Clients.Remove(client);
-            await _context.SaveChangesAsync();
-
-            await _auditHelper.LogAsync(
-                adminId,
-                "Delete",
-                "Clients",
-                $"Deleted client '{clientName}'."
-            );
-
-            TempData["Success"] = "Client deleted successfully.";
-            return RedirectToAction("ClientTabView");
+            return RedirectToAction(nameof(ClientTabView));
         }
     }
 }
